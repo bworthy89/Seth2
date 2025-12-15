@@ -299,14 +299,30 @@ public sealed partial class InputsPage : Page
         };
         panel.Children.Add(pullupToggle);
 
-        // Test button (placeholder)
+        // Test button (placeholder) - shows feedback inline since we can't open another dialog
         var testButton = new Button
         {
             Content = "Test Input",
             Margin = new Thickness(0, 8, 0, 0)
         };
-        testButton.Click += (s, e) => TestInput_Click(input);
+        var testFeedback = new TextBlock
+        {
+            Text = "",
+            Foreground = (Microsoft.UI.Xaml.Media.Brush)Application.Current.Resources["SystemFillColorSuccessBrush"],
+            Margin = new Thickness(0, 4, 0, 0)
+        };
+        testButton.Click += async (s, e) =>
+        {
+            testButton.IsEnabled = false;
+            testButton.Content = "Testing...";
+            testFeedback.Text = $"Testing pin {input.Pin}... (placeholder - serial not connected)";
+            await Task.Delay(1000);
+            testButton.Content = "Test Input";
+            testButton.IsEnabled = true;
+            testFeedback.Text = "Test complete (placeholder)";
+        };
         panel.Children.Add(testButton);
+        panel.Children.Add(testFeedback);
 
         var dialog = new ContentDialog
         {
@@ -358,11 +374,6 @@ public sealed partial class InputsPage : Page
         }
 
         return null;
-    }
-
-    private async void TestInput_Click(InputConfiguration input)
-    {
-        await ShowErrorDialog("Test Input", $"Testing '{input.Name}' on pin {input.Pin}.\n\nThis feature will be implemented when serial communication is added.");
     }
 
     #endregion
