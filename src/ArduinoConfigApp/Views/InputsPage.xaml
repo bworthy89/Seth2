@@ -5,10 +5,12 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    mc:Ignorable="d">
+    mc:Ignorable="d"
+    Loaded="Page_Loaded">
 
-    <Grid Padding="24">
+    <Grid Padding="24" Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
         <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
@@ -26,12 +28,37 @@
                     Style="{StaticResource TitleTextBlockStyle}"
                     Margin="0,0,0,8"/>
                 <TextBlock
-                    Text="Add and configure buttons, encoders, and switches"
+                    x:Name="InputCountText"
+                    Text="No inputs configured"
                     Style="{StaticResource BodyTextBlockStyle}"
                     Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
             </StackPanel>
 
-            <Button Grid.Column="1" Style="{StaticResource AccentButtonStyle}">
+            <Button Grid.Column="1" Click="AddInputButton_Click">
+                <Button.Flyout>
+                    <MenuFlyout x:Name="AddInputFlyout">
+                        <MenuFlyoutItem Text="Momentary Button" Click="AddMomentaryButton_Click">
+                            <MenuFlyoutItem.Icon>
+                                <FontIcon Glyph="&#xE73A;"/>
+                            </MenuFlyoutItem.Icon>
+                        </MenuFlyoutItem>
+                        <MenuFlyoutItem Text="Latching Button (KD2-22)" Click="AddLatchingButton_Click">
+                            <MenuFlyoutItem.Icon>
+                                <FontIcon Glyph="&#xE73A;"/>
+                            </MenuFlyoutItem.Icon>
+                        </MenuFlyoutItem>
+                        <MenuFlyoutItem Text="Toggle Switch" Click="AddToggleSwitch_Click">
+                            <MenuFlyoutItem.Icon>
+                                <FontIcon Glyph="&#xE8AB;"/>
+                            </MenuFlyoutItem.Icon>
+                        </MenuFlyoutItem>
+                        <MenuFlyoutItem Text="Rotary Encoder (EC11)" Click="AddRotaryEncoder_Click">
+                            <MenuFlyoutItem.Icon>
+                                <FontIcon Glyph="&#xE8AB;"/>
+                            </MenuFlyoutItem.Icon>
+                        </MenuFlyoutItem>
+                    </MenuFlyout>
+                </Button.Flyout>
                 <StackPanel Orientation="Horizontal" Spacing="8">
                     <FontIcon Glyph="&#xE710;" FontSize="16"/>
                     <TextBlock Text="Add Input"/>
@@ -39,30 +66,149 @@
             </Button>
         </Grid>
 
-        <!-- Content -->
+        <!-- Board Selection -->
         <Border
             Grid.Row="1"
             Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
             BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
             BorderThickness="1"
             CornerRadius="8"
-            Padding="20">
+            Padding="16"
+            Margin="0,0,0,16">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
 
-            <StackPanel
-                HorizontalAlignment="Center"
-                VerticalAlignment="Center"
-                Spacing="16">
-                <FontIcon Glyph="&#xE961;" FontSize="48" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
-                <TextBlock
-                    Text="No inputs configured"
-                    Style="{StaticResource SubtitleTextBlockStyle}"
-                    HorizontalAlignment="Center"/>
-                <TextBlock
-                    Text="Click 'Add Input' to configure buttons, encoders, or switches"
-                    Style="{StaticResource BodyTextBlockStyle}"
-                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                    HorizontalAlignment="Center"/>
-            </StackPanel>
+                <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="12" VerticalAlignment="Center">
+                    <FontIcon Glyph="&#xE950;" FontSize="20"/>
+                    <TextBlock Text="Target Board:" Style="{StaticResource BodyStrongTextBlockStyle}" VerticalAlignment="Center"/>
+                </StackPanel>
+
+                <ComboBox x:Name="BoardTypeComboBox"
+                          Grid.Column="2"
+                          SelectionChanged="BoardTypeComboBox_SelectionChanged"
+                          MinWidth="200">
+                    <ComboBoxItem Content="Arduino Pro Micro" Tag="ProMicro"/>
+                    <ComboBoxItem Content="Arduino Mega 2560" Tag="Mega2560"/>
+                </ComboBox>
+            </Grid>
         </Border>
+
+        <!-- Content Area -->
+        <Grid Grid.Row="2">
+            <!-- Empty State -->
+            <Border
+                x:Name="EmptyStatePanel"
+                Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                BorderThickness="1"
+                CornerRadius="8"
+                Padding="20"
+                Visibility="Visible">
+
+                <StackPanel
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    Spacing="16">
+                    <FontIcon Glyph="&#xE961;" FontSize="48" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                    <TextBlock
+                        Text="No inputs configured"
+                        Style="{StaticResource SubtitleTextBlockStyle}"
+                        HorizontalAlignment="Center"/>
+                    <TextBlock
+                        Text="Click 'Add Input' to configure buttons, encoders, or switches"
+                        Style="{StaticResource BodyTextBlockStyle}"
+                        Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                        HorizontalAlignment="Center"/>
+                </StackPanel>
+            </Border>
+
+            <!-- Inputs List -->
+            <ListView
+                x:Name="InputsListView"
+                Visibility="Collapsed"
+                SelectionMode="None"
+                IsItemClickEnabled="False">
+                <ListView.ItemTemplate>
+                    <DataTemplate>
+                        <Border
+                            Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                            BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                            BorderThickness="1"
+                            CornerRadius="8"
+                            Padding="16"
+                            Margin="0,0,0,8">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+
+                                <!-- Icon -->
+                                <Border Grid.Column="0"
+                                        Background="{ThemeResource SubtleFillColorSecondaryBrush}"
+                                        CornerRadius="6"
+                                        Padding="12"
+                                        Margin="0,0,16,0">
+                                    <FontIcon Glyph="{Binding TypeIcon}" FontSize="20"/>
+                                </Border>
+
+                                <!-- Info -->
+                                <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="4">
+                                    <TextBlock Text="{Binding Name}" Style="{StaticResource BodyStrongTextBlockStyle}"/>
+                                    <StackPanel Orientation="Horizontal" Spacing="16">
+                                        <TextBlock Text="{Binding TypeName}"
+                                                   Style="{StaticResource CaptionTextBlockStyle}"
+                                                   Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                                        <TextBlock Text="{Binding PinDisplay}"
+                                                   Style="{StaticResource CaptionTextBlockStyle}"
+                                                   Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                                    </StackPanel>
+                                </StackPanel>
+
+                                <!-- SPI Warning -->
+                                <Border Grid.Column="2"
+                                        Visibility="{Binding SpiWarningVisibility}"
+                                        Background="{ThemeResource SystemFillColorCautionBackgroundBrush}"
+                                        CornerRadius="4"
+                                        Padding="8,4"
+                                        Margin="8,0"
+                                        VerticalAlignment="Center">
+                                    <StackPanel Orientation="Horizontal" Spacing="6">
+                                        <FontIcon Glyph="&#xE7BA;" FontSize="12" Foreground="{ThemeResource SystemFillColorCautionBrush}"/>
+                                        <TextBlock Text="SPI Pin" Style="{StaticResource CaptionTextBlockStyle}"/>
+                                    </StackPanel>
+                                </Border>
+
+                                <!-- Edit Button -->
+                                <Button Grid.Column="3"
+                                        Style="{StaticResource SubtleButtonStyle}"
+                                        Click="EditInput_Click"
+                                        Tag="{Binding Id}"
+                                        ToolTipService.ToolTip="Edit"
+                                        Margin="4,0">
+                                    <FontIcon Glyph="&#xE70F;" FontSize="16"/>
+                                </Button>
+
+                                <!-- Delete Button -->
+                                <Button Grid.Column="4"
+                                        Style="{StaticResource SubtleButtonStyle}"
+                                        Click="DeleteInput_Click"
+                                        Tag="{Binding Id}"
+                                        ToolTipService.ToolTip="Delete">
+                                    <FontIcon Glyph="&#xE74D;" FontSize="16"/>
+                                </Button>
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
+        </Grid>
     </Grid>
 </Page>
