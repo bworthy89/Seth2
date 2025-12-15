@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "ArduinoConfigApp (Package)": {
+      "commandName": "MsixPackage"
+    },
+    "ArduinoConfigApp (Unpackaged)": {
+      "commandName": "Project"
+    }
+  }
+}

@@ -1,0 +1,93 @@
+# Build results
+[Dd]ebug/
+[Dd]ebugPublic/
+[Rr]elease/
+[Rr]eleases/
+x64/
+x86/
+[Ww][Ii][Nn]32/
+[Aa][Rr][Mm]/
+[Aa][Rr][Mm]64/
+bld/
+[Bb]in/
+[Oo]bj/
+[Ll]og/
+[Ll]ogs/
+
+# Visual Studio files
+.vs/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+*.rsuser
+
+# Visual Studio Code
+.vscode/
+
+# Rider
+.idea/
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# User-specific files
+*.user
+*.suo
+*.userprefs
+*.pubxml.user
+
+# Build results
+*.dll
+*.exe
+*.pdb
+*.ilk
+*.log
+*.lib
+*.sbr
+*.sdf
+*.opensdf
+*.opendb
+
+# NuGet
+*.nupkg
+**/[Pp]ackages/*
+!**/[Pp]ackages/build/
+*.nuget.props
+*.nuget.targets
+project.lock.json
+project.fragment.lock.json
+artifacts/
+
+# MSBuild
+*.csproj.user
+*.vbproj.user
+
+# JetBrains Rider
+*.sln.iml
+
+# Windows Store app package
+*.appx
+*.appxbundle
+*.appxupload
+
+# Publish profiles
+!**/[Pp]roperties/[Pp]ublish[Pp]rofiles/*.pubxml
+
+# Local settings
+appsettings.Development.json
+appsettings.Local.json
+
+# Crash dumps
+*.dmp
+
+# MSIX packaging
+AppPackages/
+BundleArtifacts/
+Package.StoreAssociation.xml
+_pkginfo.txt
+*.msix
+*.msixbundle
+*.appinstaller
