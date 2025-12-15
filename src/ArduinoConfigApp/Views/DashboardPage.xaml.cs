@@ -117,5 +117,8 @@ public sealed partial class DashboardPage : Page
     {
         ConnectionStatusText.Text = "Scanning for boards...";
         SerialPortService.Instance.RefreshPorts();
+
+        // Update UI with current boards after refresh
+        UpdateBoardsList(SerialPortService.Instance.DetectedBoards.ToList());
     }
 }
