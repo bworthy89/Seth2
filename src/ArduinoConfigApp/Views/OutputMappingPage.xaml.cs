@@ -112,8 +112,6 @@ public sealed partial class OutputMappingPage : Page
         };
         panel.Children.Add(infoText);
 
-        KeyboardAction mainAction;
-
         if (input.Type == InputType.RotaryEncoder)
         {
             // Encoder has CW/CCW actions
@@ -124,15 +122,11 @@ public sealed partial class OutputMappingPage : Page
             panel.Children.Add(ccwPanel.Panel);
 
             // Optional button action
+            (StackPanel Panel, Func<KeyboardAction> GetAction)? btnPanel = null;
             if (input.ButtonPin.HasValue)
             {
-                var btnPanel = CreateKeyActionPanel("Encoder Button Press", mapping.Action);
-                panel.Children.Add(btnPanel.Panel);
-                mainAction = btnPanel.GetAction;
-            }
-            else
-            {
-                mainAction = new KeyboardAction();
+                btnPanel = CreateKeyActionPanel("Encoder Button Press", mapping.Action);
+                panel.Children.Add(btnPanel.Value.Panel);
             }
 
             var dialog = new ContentDialog
@@ -150,9 +144,9 @@ public sealed partial class OutputMappingPage : Page
                 return new OutputMapping
                 {
                     InputId = input.Id,
-                    Action = mainAction,
-                    ClockwiseAction = cwPanel.GetAction,
-                    CounterClockwiseAction = ccwPanel.GetAction
+                    Action = btnPanel?.GetAction() ?? new KeyboardAction(),
+                    ClockwiseAction = cwPanel.GetAction(),
+                    CounterClockwiseAction = ccwPanel.GetAction()
                 };
             }
         }
@@ -177,7 +171,7 @@ public sealed partial class OutputMappingPage : Page
                 return new OutputMapping
                 {
                     InputId = input.Id,
-                    Action = actionPanel.GetAction
+                    Action = actionPanel.GetAction()  // Call the function to get current values
                 };
             }
         }
@@ -185,7 +179,7 @@ public sealed partial class OutputMappingPage : Page
         return null;
     }
 
-    private (StackPanel Panel, KeyboardAction GetAction) CreateKeyActionPanel(string header, KeyboardAction action)
+    private (StackPanel Panel, Func<KeyboardAction> GetAction) CreateKeyActionPanel(string header, KeyboardAction action)
     {
         var panel = new StackPanel { Spacing = 8 };
 
@@ -291,8 +285,8 @@ public sealed partial class OutputMappingPage : Page
         UpdatePreview();
         panel.Children.Add(previewText);
 
-        // Return panel and getter function
-        KeyboardAction GetAction() => new KeyboardAction
+        // Return panel and getter function (as Func so it's called when dialog closes, not when created)
+        Func<KeyboardAction> getAction = () => new KeyboardAction
         {
             Key = keyCombo.SelectedItem?.ToString() ?? "",
             Ctrl = ctrlCheck.IsChecked == true,
@@ -304,7 +298,7 @@ public sealed partial class OutputMappingPage : Page
                 ? ActionType.KeyCombo : ActionType.SingleKey
         };
 
-        return (panel, GetAction());
+        return (panel, getAction);
     }
 
     private async Task<KeyboardAction?> CaptureKeyPress()
