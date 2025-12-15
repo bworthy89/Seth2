@@ -36,16 +36,13 @@ public partial class App : Application
             element.RequestedTheme = theme;
         }
 
+        // Apply theme to Frame before setting as content
+        rootFrame.RequestedTheme = theme;
+
         _window.Content = rootFrame;
 
         // Navigate to shell
         rootFrame.Navigate(typeof(ShellPage), e.Arguments);
-
-        // Apply theme to root
-        if (_window.Content is FrameworkElement rootElement)
-        {
-            rootElement.RequestedTheme = theme;
-        }
 
         _window.Activate();
     }

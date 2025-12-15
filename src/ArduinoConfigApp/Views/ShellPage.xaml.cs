@@ -18,12 +18,20 @@ public sealed partial class ShellPage : Page
     public ShellPage()
     {
         this.InitializeComponent();
+        this.Loaded += ShellPage_Loaded;
+    }
+
+    private void ShellPage_Loaded(object sender, RoutedEventArgs e)
+    {
         LoadThemeSetting();
     }
 
     private void LoadThemeSetting()
     {
         var theme = SettingsService.Instance.Settings.Theme;
+
+        // Set combo box selection without triggering change event
+        ThemeComboBox.SelectionChanged -= ThemeComboBox_SelectionChanged;
         foreach (ComboBoxItem item in ThemeComboBox.Items)
         {
             if (item.Tag?.ToString() == theme)
@@ -32,6 +40,7 @@ public sealed partial class ShellPage : Page
                 break;
             }
         }
+        ThemeComboBox.SelectionChanged += ThemeComboBox_SelectionChanged;
 
         // Apply the theme
         ApplyTheme(theme);
@@ -107,6 +116,10 @@ public sealed partial class ShellPage : Page
             _ => ElementTheme.Default
         };
 
+        // Apply theme to the page itself
+        this.RequestedTheme = elementTheme;
+
+        // Also apply to the root Frame if available
         if (this.XamlRoot?.Content is FrameworkElement rootElement)
         {
             rootElement.RequestedTheme = elementTheme;
