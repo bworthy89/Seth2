@@ -185,32 +185,44 @@ public sealed partial class DashboardPage : Page
 
     private async void NewConfigButton_Click(object sender, RoutedEventArgs e)
     {
-        // Check for unsaved changes
-        if (ConfigurationService.Instance.HasUnsavedChanges)
+        try
         {
-            var dialog = new ContentDialog
+            // Check for unsaved changes
+            if (ConfigurationService.Instance.HasUnsavedChanges)
             {
-                Title = "Unsaved Changes",
-                Content = "Do you want to save changes to the current configuration?",
-                PrimaryButtonText = "Save",
-                SecondaryButtonText = "Don't Save",
-                CloseButtonText = "Cancel",
-                XamlRoot = this.XamlRoot
-            };
+                var dialog = new ContentDialog
+                {
+                    Title = "Unsaved Changes",
+                    Content = "Do you want to save changes to the current configuration?",
+                    PrimaryButtonText = "Save",
+                    SecondaryButtonText = "Don't Save",
+                    CloseButtonText = "Cancel",
+                    XamlRoot = this.XamlRoot
+                };
 
-            var result = await dialog.ShowAsync();
-            if (result == ContentDialogResult.Primary)
-            {
-                await SaveConfigurationAsync();
+                var result = await dialog.ShowAsync();
+                if (result == ContentDialogResult.Primary)
+                {
+                    await SaveConfigurationAsync();
+                }
+                else if (result == ContentDialogResult.None)
+                {
+                    return; // Cancel
+                }
             }
-            else if (result == ContentDialogResult.None)
-            {
-                return; // Cancel
-            }
+
+            ConfigurationService.Instance.NewConfiguration();
+            UpdateConfigurationUI();
+
+            // Brief visual feedback
+            ConfigNameText.Text = "New configuration created";
+            await Task.Delay(1000);
+            UpdateConfigurationUI();
         }
-
-        ConfigurationService.Instance.NewConfiguration();
-        UpdateConfigurationUI();
+        catch (Exception ex)
+        {
+            await ShowErrorDialog("Error", ex.Message);
+        }
     }
 
     private async void OpenConfigButton_Click(object sender, RoutedEventArgs e)
