@@ -5,9 +5,10 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    mc:Ignorable="d">
+    mc:Ignorable="d"
+    Loaded="Page_Loaded">
 
-    <Grid Padding="24">
+    <Grid Padding="24" Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
@@ -20,7 +21,8 @@
                 Style="{StaticResource TitleTextBlockStyle}"
                 Margin="0,0,0,8"/>
             <TextBlock
-                Text="Map inputs to keyboard outputs, combos, and special keys"
+                x:Name="MappingCountText"
+                Text="Map inputs to keyboard outputs"
                 Style="{StaticResource BodyTextBlockStyle}"
                 Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
         </StackPanel>
@@ -29,10 +31,10 @@
         <Grid Grid.Row="1">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="350"/>
             </Grid.ColumnDefinitions>
 
-            <!-- Inputs List -->
+            <!-- Inputs/Mappings List -->
             <Border
                 Grid.Column="0"
                 Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
@@ -40,50 +42,178 @@
                 BorderThickness="1"
                 CornerRadius="8"
                 Padding="20"
-                Margin="0,0,8,0">
+                Margin="0,0,16,0">
 
-                <StackPanel>
-                    <TextBlock Text="Configured Inputs" Style="{StaticResource SubtitleTextBlockStyle}" Margin="0,0,0,16"/>
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <TextBlock Grid.Row="0" Text="Input Mappings" Style="{StaticResource SubtitleTextBlockStyle}" Margin="0,0,0,16"/>
+
+                    <!-- Empty State -->
                     <StackPanel
+                        x:Name="EmptyStatePanel"
+                        Grid.Row="1"
                         HorizontalAlignment="Center"
                         VerticalAlignment="Center"
                         Spacing="8"
-                        Margin="0,40,0,0">
+                        Visibility="Visible">
                         <FontIcon Glyph="&#xE961;" FontSize="32" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
                         <TextBlock
                             Text="No inputs configured"
                             Style="{StaticResource BodyTextBlockStyle}"
                             Foreground="{ThemeResource TextFillColorSecondaryBrush}"
                             HorizontalAlignment="Center"/>
+                        <TextBlock
+                            Text="Add inputs in the Inputs panel first"
+                            Style="{StaticResource CaptionTextBlockStyle}"
+                            Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                            HorizontalAlignment="Center"/>
                     </StackPanel>
-                </StackPanel>
+
+                    <!-- Mappings List -->
+                    <ListView
+                        x:Name="MappingsListView"
+                        Grid.Row="1"
+                        Visibility="Collapsed"
+                        SelectionMode="Single"
+                        SelectionChanged="MappingsListView_SelectionChanged">
+                        <ListView.ItemTemplate>
+                            <DataTemplate>
+                                <Border
+                                    Background="{ThemeResource SubtleFillColorSecondaryBrush}"
+                                    CornerRadius="6"
+                                    Padding="12"
+                                    Margin="0,0,0,8">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+
+                                        <!-- Input Icon -->
+                                        <FontIcon Grid.Column="0" Glyph="{Binding TypeIcon}" FontSize="20" Margin="0,0,12,0" VerticalAlignment="Center"/>
+
+                                        <!-- Input Info -->
+                                        <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                            <TextBlock Text="{Binding InputName}" Style="{StaticResource BodyStrongTextBlockStyle}"/>
+                                            <TextBlock Text="{Binding InputType}" Style="{StaticResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                                        </StackPanel>
+
+                                        <!-- Mapping Display -->
+                                        <Border Grid.Column="2"
+                                                Background="{Binding MappingBackground}"
+                                                CornerRadius="4"
+                                                Padding="12,6"
+                                                Margin="8,0"
+                                                VerticalAlignment="Center">
+                                            <TextBlock Text="{Binding MappingDisplay}" Style="{StaticResource BodyTextBlockStyle}"/>
+                                        </Border>
+
+                                        <!-- Edit Button -->
+                                        <Button Grid.Column="3"
+                                                Click="EditMapping_Click"
+                                                Tag="{Binding InputId}"
+                                                ToolTipService.ToolTip="Edit Mapping"
+                                                Padding="8">
+                                            <FontIcon Glyph="&#xE70F;" FontSize="14"/>
+                                        </Button>
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </ListView.ItemTemplate>
+                    </ListView>
+                </Grid>
             </Border>
 
-            <!-- Keyboard Preview -->
+            <!-- Keyboard Preview Panel -->
             <Border
                 Grid.Column="1"
                 Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
                 BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
                 BorderThickness="1"
                 CornerRadius="8"
-                Padding="20"
-                Margin="8,0,0,0">
+                Padding="20">
 
-                <StackPanel>
-                    <TextBlock Text="Keyboard Output Preview" Style="{StaticResource SubtitleTextBlockStyle}" Margin="0,0,0,16"/>
-                    <StackPanel
-                        HorizontalAlignment="Center"
-                        VerticalAlignment="Center"
-                        Spacing="8"
-                        Margin="0,40,0,0">
-                        <FontIcon Glyph="&#xE765;" FontSize="32" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
-                        <TextBlock
-                            Text="Select an input to map"
-                            Style="{StaticResource BodyTextBlockStyle}"
-                            Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                            HorizontalAlignment="Center"/>
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <TextBlock Grid.Row="0" Text="Quick Reference" Style="{StaticResource SubtitleTextBlockStyle}" Margin="0,0,0,16"/>
+
+                    <!-- Selected Input Info -->
+                    <StackPanel x:Name="SelectedInputPanel" Grid.Row="1" Visibility="Collapsed" Margin="0,0,0,16">
+                        <TextBlock x:Name="SelectedInputName" Style="{StaticResource BodyStrongTextBlockStyle}"/>
+                        <TextBlock x:Name="SelectedInputMapping" Style="{StaticResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
                     </StackPanel>
-                </StackPanel>
+
+                    <!-- Key Categories -->
+                    <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto">
+                        <StackPanel Spacing="16">
+                            <!-- Modifiers -->
+                            <StackPanel>
+                                <TextBlock Text="Modifiers" Style="{StaticResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" Margin="0,0,0,8"/>
+                                <StackPanel Orientation="Horizontal" Spacing="4">
+                                    <Border Background="{ThemeResource SubtleFillColorSecondaryBrush}" CornerRadius="4" Padding="8,4">
+                                        <TextBlock Text="Ctrl" Style="{StaticResource CaptionTextBlockStyle}"/>
+                                    </Border>
+                                    <Border Background="{ThemeResource SubtleFillColorSecondaryBrush}" CornerRadius="4" Padding="8,4">
+                                        <TextBlock Text="Alt" Style="{StaticResource CaptionTextBlockStyle}"/>
+                                    </Border>
+                                    <Border Background="{ThemeResource SubtleFillColorSecondaryBrush}" CornerRadius="4" Padding="8,4">
+                                        <TextBlock Text="Shift" Style="{StaticResource CaptionTextBlockStyle}"/>
+                                    </Border>
+                                    <Border Background="{ThemeResource SubtleFillColorSecondaryBrush}" CornerRadius="4" Padding="8,4">
+                                        <TextBlock Text="Win" Style="{StaticResource CaptionTextBlockStyle}"/>
+                                    </Border>
+                                </StackPanel>
+                            </StackPanel>
+
+                            <!-- Function Keys -->
+                            <StackPanel>
+                                <TextBlock Text="Function Keys" Style="{StaticResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" Margin="0,0,0,8"/>
+                                <TextBlock Text="F1-F24" Style="{StaticResource CaptionTextBlockStyle}"/>
+                            </StackPanel>
+
+                            <!-- Media Keys -->
+                            <StackPanel>
+                                <TextBlock Text="Media Keys" Style="{StaticResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" Margin="0,0,0,8"/>
+                                <TextBlock Text="Play, Pause, Stop, Next, Prev, Vol+, Vol-, Mute" Style="{StaticResource CaptionTextBlockStyle}" TextWrapping="Wrap"/>
+                            </StackPanel>
+
+                            <!-- Navigation -->
+                            <StackPanel>
+                                <TextBlock Text="Navigation" Style="{StaticResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" Margin="0,0,0,8"/>
+                                <TextBlock Text="Up, Down, Left, Right, Home, End, PgUp, PgDn" Style="{StaticResource CaptionTextBlockStyle}" TextWrapping="Wrap"/>
+                            </StackPanel>
+
+                            <!-- Special -->
+                            <StackPanel>
+                                <TextBlock Text="Special Keys" Style="{StaticResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" Margin="0,0,0,8"/>
+                                <TextBlock Text="Enter, Tab, Esc, Space, Backspace, Delete, Insert" Style="{StaticResource CaptionTextBlockStyle}" TextWrapping="Wrap"/>
+                            </StackPanel>
+
+                            <!-- Duplicate Warning -->
+                            <Border x:Name="DuplicateWarningPanel"
+                                    Background="{ThemeResource SystemFillColorCautionBackgroundBrush}"
+                                    CornerRadius="6"
+                                    Padding="12"
+                                    Visibility="Collapsed">
+                                <StackPanel Orientation="Horizontal" Spacing="8">
+                                    <FontIcon Glyph="&#xE7BA;" FontSize="16" Foreground="{ThemeResource SystemFillColorCautionBrush}"/>
+                                    <TextBlock x:Name="DuplicateWarningText" TextWrapping="Wrap" Style="{StaticResource CaptionTextBlockStyle}"/>
+                                </StackPanel>
+                            </Border>
+                        </StackPanel>
+                    </ScrollViewer>
+                </Grid>
             </Border>
         </Grid>
     </Grid>
