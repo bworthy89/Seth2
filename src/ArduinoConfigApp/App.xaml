@@ -11,38 +11,140 @@
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <XamlControlsResources xmlns="using:Microsoft.UI.Xaml.Controls" />
-                <!-- Other merged dictionaries here -->
             </ResourceDictionary.MergedDictionaries>
-            <!-- Other app resources here -->
+
+            <!-- Brand Colors -->
             <Color x:Key="Primary">#512BD4</Color>
+            <Color x:Key="PrimaryLight">#7B5CDC</Color>
+            <Color x:Key="PrimaryDark">#3D1FA3</Color>
 
             <SolidColorBrush x:Key="PrimaryBrush" Color="{StaticResource Primary}" />
+            <SolidColorBrush x:Key="PrimaryLightBrush" Color="{StaticResource PrimaryLight}" />
+            <SolidColorBrush x:Key="PrimaryDarkBrush" Color="{StaticResource PrimaryDark}" />
             <SolidColorBrush x:Key="WhiteBrush" Color="White" />
             <SolidColorBrush x:Key="BlackBrush" Color="Black" />
 
             <x:Double x:Key="AppFontSize">14</x:Double>
 
+            <!-- Subtle Button Style - low profile, transparent background -->
+            <Style x:Key="SubtleButtonStyle" TargetType="Button">
+                <Setter Property="Background" Value="Transparent"/>
+                <Setter Property="Foreground" Value="{ThemeResource TextFillColorPrimaryBrush}"/>
+                <Setter Property="BorderBrush" Value="Transparent"/>
+                <Setter Property="BorderThickness" Value="0"/>
+                <Setter Property="Padding" Value="8"/>
+                <Setter Property="HorizontalAlignment" Value="Center"/>
+                <Setter Property="VerticalAlignment" Value="Center"/>
+                <Setter Property="FontFamily" Value="{ThemeResource ContentControlThemeFontFamily}"/>
+                <Setter Property="FontWeight" Value="Normal"/>
+                <Setter Property="FontSize" Value="{ThemeResource ControlContentThemeFontSize}"/>
+                <Setter Property="CornerRadius" Value="4"/>
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="Button">
+                            <ContentPresenter
+                                x:Name="ContentPresenter"
+                                Background="{TemplateBinding Background}"
+                                BackgroundSizing="OuterBorderEdge"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                Content="{TemplateBinding Content}"
+                                ContentTemplate="{TemplateBinding ContentTemplate}"
+                                ContentTransitions="{TemplateBinding ContentTransitions}"
+                                CornerRadius="{TemplateBinding CornerRadius}"
+                                Padding="{TemplateBinding Padding}"
+                                HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}">
+                                <VisualStateManager.VisualStateGroups>
+                                    <VisualStateGroup x:Name="CommonStates">
+                                        <VisualState x:Name="Normal"/>
+                                        <VisualState x:Name="PointerOver">
+                                            <Storyboard>
+                                                <ObjectAnimationUsingKeyFrames Storyboard.TargetName="ContentPresenter" Storyboard.TargetProperty="Background">
+                                                    <DiscreteObjectKeyFrame KeyTime="0" Value="{ThemeResource SubtleFillColorSecondaryBrush}"/>
+                                                </ObjectAnimationUsingKeyFrames>
+                                            </Storyboard>
+                                        </VisualState>
+                                        <VisualState x:Name="Pressed">
+                                            <Storyboard>
+                                                <ObjectAnimationUsingKeyFrames Storyboard.TargetName="ContentPresenter" Storyboard.TargetProperty="Background">
+                                                    <DiscreteObjectKeyFrame KeyTime="0" Value="{ThemeResource SubtleFillColorTertiaryBrush}"/>
+                                                </ObjectAnimationUsingKeyFrames>
+                                            </Storyboard>
+                                        </VisualState>
+                                        <VisualState x:Name="Disabled">
+                                            <Storyboard>
+                                                <ObjectAnimationUsingKeyFrames Storyboard.TargetName="ContentPresenter" Storyboard.TargetProperty="Foreground">
+                                                    <DiscreteObjectKeyFrame KeyTime="0" Value="{ThemeResource TextFillColorDisabledBrush}"/>
+                                                </ObjectAnimationUsingKeyFrames>
+                                            </Storyboard>
+                                        </VisualState>
+                                    </VisualStateGroup>
+                                </VisualStateManager.VisualStateGroups>
+                            </ContentPresenter>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+
+            <!-- Icon Button Style - for icon-only buttons -->
+            <Style x:Key="IconButtonStyle" TargetType="Button" BasedOn="{StaticResource SubtleButtonStyle}">
+                <Setter Property="Padding" Value="10"/>
+                <Setter Property="MinWidth" Value="36"/>
+                <Setter Property="MinHeight" Value="36"/>
+            </Style>
+
+            <!-- Card Style for Border elements -->
+            <Style x:Key="CardStyle" TargetType="Border">
+                <Setter Property="Background" Value="{ThemeResource CardBackgroundFillColorDefaultBrush}"/>
+                <Setter Property="BorderBrush" Value="{ThemeResource CardStrokeColorDefaultBrush}"/>
+                <Setter Property="BorderThickness" Value="1"/>
+                <Setter Property="CornerRadius" Value="8"/>
+                <Setter Property="Padding" Value="16"/>
+            </Style>
+
+            <!-- Header Card Style - slightly larger padding -->
+            <Style x:Key="HeaderCardStyle" TargetType="Border" BasedOn="{StaticResource CardStyle}">
+                <Setter Property="Padding" Value="20"/>
+            </Style>
+
             <Style x:Key="MyLabel" TargetType="TextBlock">
-                <Setter Property="Foreground"
-                        Value="{StaticResource PrimaryBrush}" />
+                <Setter Property="Foreground" Value="{StaticResource PrimaryBrush}" />
             </Style>
 
             <Style x:Key="Action" TargetType="Button">
-                <Setter Property="FontSize"
-                        Value="{StaticResource AppFontSize}" />
-                <Setter Property="Padding"
-                        Value="14,10" />
+                <Setter Property="FontSize" Value="{StaticResource AppFontSize}" />
+                <Setter Property="Padding" Value="14,10" />
             </Style>
 
-            <Style x:Key="PrimaryAction"
-                   TargetType="Button"
-                   BasedOn="{StaticResource Action}">
-                <Setter Property="Background"
-                        Value="{StaticResource PrimaryBrush}" />
-                <Setter Property="CornerRadius"
-                        Value="8" />
-                <Setter Property="Foreground"
-                        Value="{StaticResource WhiteBrush}" />
+            <Style x:Key="PrimaryAction" TargetType="Button" BasedOn="{StaticResource Action}">
+                <Setter Property="Background" Value="{StaticResource PrimaryBrush}" />
+                <Setter Property="CornerRadius" Value="8" />
+                <Setter Property="Foreground" Value="{StaticResource WhiteBrush}" />
+            </Style>
+
+            <!-- Page Header Style -->
+            <Style x:Key="PageHeaderStyle" TargetType="TextBlock" BasedOn="{StaticResource TitleTextBlockStyle}">
+                <Setter Property="Margin" Value="0,0,0,8"/>
+            </Style>
+
+            <!-- Status Badge Styles -->
+            <Style x:Key="SuccessBadgeStyle" TargetType="Border">
+                <Setter Property="Background" Value="{ThemeResource SystemFillColorSuccessBackgroundBrush}"/>
+                <Setter Property="CornerRadius" Value="4"/>
+                <Setter Property="Padding" Value="8,4"/>
+            </Style>
+
+            <Style x:Key="WarningBadgeStyle" TargetType="Border">
+                <Setter Property="Background" Value="{ThemeResource SystemFillColorCautionBackgroundBrush}"/>
+                <Setter Property="CornerRadius" Value="4"/>
+                <Setter Property="Padding" Value="8,4"/>
+            </Style>
+
+            <Style x:Key="ErrorBadgeStyle" TargetType="Border">
+                <Setter Property="Background" Value="{ThemeResource SystemFillColorCriticalBackgroundBrush}"/>
+                <Setter Property="CornerRadius" Value="4"/>
+                <Setter Property="Padding" Value="8,4"/>
             </Style>
         </ResourceDictionary>
     </Application.Resources>
