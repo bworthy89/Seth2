@@ -12,7 +12,8 @@ public sealed partial class ShellPage : Page
         { "Inputs", typeof(InputsPage) },
         { "Display", typeof(DisplayPage) },
         { "OutputMapping", typeof(OutputMappingPage) },
-        { "Testing", typeof(TestingPage) }
+        { "Testing", typeof(TestingPage) },
+        { "Wiring", typeof(WiringPage) }
     };
 
     public ShellPage()
